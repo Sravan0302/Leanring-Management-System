@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificate of Completion</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Georgia, serif;
+}
+
+body{
+    background:#f1f5f9;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+}
+
+.certificate{
+    background:white;
+    width:900px;
+    max-width:100%;
+    padding:50px;
+    text-align:center;
+    border:12px solid #2563eb;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+.logo{
+    font-size:22px;
+    color:#2563eb;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+h1{
+    font-size:48px;
+    color:#0f172a;
+    margin-bottom:20px;
+}
+
+.subtitle{
+    font-size:22px;
+    color:#475569;
+    margin-bottom:30px;
+}
+
+.student-name{
+    font-size:42px;
+    color:#2563eb;
+    font-weight:bold;
+    margin:25px 0;
+}
+
+.course-name{
+    font-size:30px;
+    color:#0f172a;
+    margin:20px 0;
+}
+
+.date{
+    margin-top:30px;
+    font-size:18px;
+}
+
+.signature{
+    margin-top:50px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.sign-box{
+    width:200px;
+}
+
+.line{
+    border-top:2px solid black;
+    margin-bottom:10px;
+}
+
+button{
+    margin-top:30px;
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="certificate">
+
+<div class="logo">
+Learning Management System
+</div>
+
+<h1>Certificate of Completion</h1>
+
+<p class="subtitle">
+This certificate is proudly presented to
+</p>
+
+<div class="student-name">
+Sravan Juluri
+</div>
+
+<p>
+for successfully completing the course
+</p>
+
+<div class="course-name">
+Web Development
+</div>
+
+<p>
+and demonstrating dedication and proficiency
+in learning the course material.
+</p>
+
+<div class="date">
+Date: August 2026
+</div>
+
+<div class="signature">
+
+<div class="sign-box">
+<div class="line"></div>
+Instructor
+</div>
+
+<div class="sign-box">
+<div class="line"></div>
+Director
+</div>
+
+</div>
+
+<button onclick="window.print()">
+Download / Print Certificate
+</button>
+
+</div>
+
+</body>
+</html>

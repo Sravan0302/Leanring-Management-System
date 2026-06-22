@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instructor Dashboard</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f1f5f9;
+}
+
+/* Navbar */
+
+nav{
+    background:#0f172a;
+    padding:15px 30px;
+    display:flex;
+    gap:25px;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+nav a:hover{
+    color:#38bdf8;
+}
+
+/* Header */
+
+header{
+    background:#1e293b;
+    color:white;
+    text-align:center;
+    padding:25px;
+}
+
+.container{
+    padding:30px;
+}
+
+.section{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    margin-bottom:25px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.section h2{
+    margin-bottom:15px;
+    color:#0f172a;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#38bdf8;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0284c7;
+}
+
+.item{
+    background:#e2e8f0;
+    padding:12px;
+    margin-top:10px;
+    border-radius:8px;
+}
+
+.student-card{
+    background:#e2e8f0;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+.progress{
+    width:100%;
+    background:#cbd5e1;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:10px;
+}
+
+.progress-bar{
+    height:25px;
+    background:#22c55e;
+    color:white;
+    text-align:center;
+    line-height:25px;
+}
+
+.course-list li{
+    margin:10px 0;
+}
+
+@media(max-width:768px){
+
+nav{
+    flex-wrap:wrap;
+}
+
+.container{
+    padding:15px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Navigation -->
+
+<nav>
+
+<a href="instructor.html">Dashboard</a>
+
+<a href="../course/courses.html">Courses</a>
+
+<a href="../assignments/assignments.html">Assignments</a>
+
+<a href="../certificate/certificate.html">Certificate</a>
+
+<a href="../index.html">Logout</a>
+
+</nav>
+
+<!-- Header -->
+
+<header>
+
+<h1>Instructor Dashboard</h1>
+
+<p>Manage Courses, Assignments and Students</p>
+
+</header>
+
+<div class="container">
+
+<!-- Add Course -->
+
+<div class="section">
+
+<h2>Add New Course</h2>
+
+<input
+type="text"
+id="courseName"
+placeholder="Enter Course Name">
+
+<textarea
+id="courseDesc"
+rows="3"
+placeholder="Enter Course Description"></textarea>
+
+<input
+type="text"
+id="videoLink"
+placeholder="Enter Video URL">
+
+<button onclick="addCourse()">
+Add Course
+</button>
+
+<div id="courseList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
+
+</div>
+
+<!-- Add Assignment -->
+
+<div class="section">
+
+<h2>Create Assignment</h2>
+
+<input
+type="text"
+id="assignmentTitle"
+placeholder="Assignment Title">
+
+<textarea
+id="assignmentDesc"
+rows="4"
+placeholder="Assignment Description">
+</textarea>
+
+<button onclick="addAssignment()">
+Create Assignment
+</button>
+
+<div id="assignmentList"></div>
+
+</div>
+
+<!-- Student Progress -->
+
+<div class="section">
+
+<h2>Student Progress</h2>
+
+<div class="student-card">
+
+<strong>Sravan Juluri</strong>
+
+<div class="progress">
+<div class="progress-bar"
+style="width:80%">
+80%
+</div>
+</div>
+
+</div>
+
+<div class="student-card">
+
+<strong>Rahul</strong>
+
+<div class="progress">
+<div class="progress-bar"
+style="width:65%">
+65%
+</div>
+</div>
+
+</div>
+
+<div class="student-card">
+
+<strong>Anjali</strong>
+
+<div class="progress">
+<div class="progress-bar"
+style="width:92%">
+92%
+</div>
+</div>
+
+</div>
+
+</div>
+
+<!-- Available Courses -->
+
+<div class="section">
+
+<h2>Available Courses</h2>
+
+<ul class="course-list">
+
+<li>Web Development</li>
+
+<li>Python Programming</li>
+
+<li>Machine Learning</li>
+
+<li>Data Structures</li>
+
+<li>Computer Networks</li>
+
+</ul>
+
+</div>
+
+</div>
+
+<script>
+// Check Authentication on Load
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+const userName = localStorage.getItem("userName");
+
+if (!token || role !== "instructor") {
+    alert("Unauthorized access! Please login first.");
+    localStorage.clear();
+    window.location.href = "../index.html";
+}
+
+// Display instructor welcome
+if (userName) {
+    document.querySelector("header p").innerText = `Manage Courses, Assignments and Students | Welcome, ${userName}`;
+}
+
+// Fetch and render courses from backend
+async function loadCourses() {
+    try {
+        const response = await fetch("http://localhost:5000/api/courses");
+        const courses = await response.json();
+
+        // Populate lists
+        const courseList = document.getElementById("courseList");
+        courseList.innerHTML = "";
+
+        const availableList = document.querySelector(".course-list");
+        if (availableList) {
+            availableList.innerHTML = "";
+        }
+
+        if (courses.length === 0) {
+            courseList.innerHTML = "<p style='color: #64748b;'>No courses created yet.</p>";
+            return;
+        }
+
+        courses.forEach(course => {
+            // Add to courseList
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `📚 <strong>${course.title}</strong> - ${course.description || "No description"}`;
+            courseList.appendChild(div);
+
+            // Add to availableList
+            if (availableList) {
+                const li = document.createElement("li");
+                li.textContent = course.title;
+                availableList.appendChild(li);
+            }
+        });
+    } catch (error) {
+        console.error("Error loading courses:", error);
+    }
+}
+
+// Create new course on backend
+async function addCourse() {
+    const title = document.getElementById("courseName").value.trim();
+    const description = document.getElementById("courseDesc").value.trim();
+    const videoUrl = document.getElementById("videoLink").value.trim();
+
+    if (!title || !description) {
+        alert("Course Name and Description are required");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:5000/api/courses", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ title, description, videoUrl })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Course added successfully!");
+            document.getElementById("courseName").value = "";
+            document.getElementById("courseDesc").value = "";
+            document.getElementById("videoLink").value = "";
+            loadCourses();
+        } else {
+            alert(data.message || "Failed to add course");
+        }
+    } catch (error) {
+        console.error("Error adding course:", error);
+        alert("Error connecting to server.");
+    }
+}
+
+// Assignment logic (mocked locally for UI)
+function addAssignment() {
+    let assignment = document.getElementById("assignmentTitle").value.trim();
+    if(assignment===""){
+        alert("Please enter assignment title");
+        return;
+    }
+
+    let div = document.createElement("div");
+    div.className="item";
+    div.innerHTML= "📝 " + assignment;
+    document.getElementById("assignmentList").appendChild(div);
+
+    document.getElementById("assignmentTitle").value="";
+    document.getElementById("assignmentDesc").value="";
+}
+
+// Handle Logout
+document.querySelectorAll("nav a").forEach(link => {
+    if (link.textContent === "Logout") {
+        link.href = "#";
+        link.onclick = (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = "../index.html";
+        };
+    }
+});
+
+// Run
+loadCourses();
+</script>
+
+</body>
+</html>

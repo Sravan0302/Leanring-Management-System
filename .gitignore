@@ -1,0 +1,12 @@
+# Dependencies
+backend/node_modules/
+
+# Local databases
+backend/db.json
+
+# Environments and Secrets
+backend/.env
+
+# Logs and system files
+*.log
+.system_generated/

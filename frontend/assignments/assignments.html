@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Assignments</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f1f5f9;
+}
+
+header{
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+
+.container{
+    padding:30px;
+}
+
+.assignment-card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.assignment-card h3{
+    color:#0f172a;
+    margin-bottom:10px;
+}
+
+.assignment-card p{
+    margin-bottom:10px;
+}
+
+input[type="file"]{
+    margin:10px 0;
+}
+
+button{
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    background:#38bdf8;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0284c7;
+}
+
+.status{
+    margin-top:10px;
+    font-weight:bold;
+    color:#16a34a;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Assignments</h1>
+</header>
+
+<div class="container">
+
+    <!-- Assignment 1 -->
+
+    <div class="assignment-card">
+
+        <h3>Portfolio Website</h3>
+
+        <p>
+        Create a personal portfolio using
+        HTML, CSS and JavaScript.
+        </p>
+
+        <p>
+        Deadline: 20 August 2026
+        </p>
+
+        <input type="file">
+
+        <br>
+
+        <button onclick="submitAssignment('status1')">
+            Submit Assignment
+        </button>
+
+        <div id="status1" class="status"></div>
+
+    </div>
+
+    <!-- Assignment 2 -->
+
+    <div class="assignment-card">
+
+        <h3>JavaScript Quiz App</h3>
+
+        <p>
+        Build a quiz application using
+        JavaScript.
+        </p>
+
+        <p>
+        Deadline: 25 August 2026
+        </p>
+
+        <input type="file">
+
+        <br>
+
+        <button onclick="submitAssignment('status2')">
+            Submit Assignment
+        </button>
+
+        <div id="status2" class="status"></div>
+
+    </div>
+
+</div>
+
+<script>
+
+function submitAssignment(id){
+
+document.getElementById(id)
+.innerHTML =
+"✓ Assignment Submitted Successfully";
+
+}
+
+</script>
+
+</body>
+</html>

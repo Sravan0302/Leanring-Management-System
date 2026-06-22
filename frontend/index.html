@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LMS Authentication</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+}
+
+.auth-container{
+    width:400px;
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+.auth-container h2{
+    text-align:center;
+    margin-bottom:10px;
+    color:#0f172a;
+}
+
+.subtitle {
+    text-align:center;
+    color:#64748b;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.tabs {
+    display:flex;
+    margin-bottom:20px;
+    border-bottom:2px solid #f1f5f9;
+}
+
+.tab-btn {
+    flex:1;
+    background:none;
+    border:none;
+    color:#64748b;
+    padding:12px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    border-radius:0;
+    transition:all 0.2s ease;
+    text-align:center;
+}
+
+.tab-btn:hover {
+    color:#0f172a;
+    background:rgba(56,189,248,0.05);
+}
+
+.tab-btn.active {
+    color:#38bdf8;
+    border-bottom:2px solid #38bdf8;
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    outline:none;
+}
+
+input:focus,
+select:focus {
+    border-color:#38bdf8;
+}
+
+button.submit-btn{
+    width:100%;
+    padding:12px;
+    border:none;
+    background:#38bdf8;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    border-radius:8px;
+    cursor:pointer;
+    transition:background 0.2s ease;
+}
+
+button.submit-btn:hover{
+    background:#0284c7;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <h2>Learning Management System</h2>
+    <div class="subtitle">Secure Portal Login</div>
+
+    <div class="tabs">
+        <button id="loginTab" class="tab-btn active" onclick="showTab('login')">Login</button>
+        <button id="registerTab" class="tab-btn" onclick="showTab('register')">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+        <input type="text" id="loginEmail" placeholder="Email Address">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <button class="submit-btn" onclick="login()">Login</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerForm" style="display:none;">
+        <input type="text" id="regName" placeholder="Full Name">
+        <input type="text" id="regEmail" placeholder="Email Address">
+        <input type="password" id="regPassword" placeholder="Password">
+        <select id="regRole">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+        </select>
+        <button class="submit-btn" onclick="register()">Create Account</button>
+    </div>
+
+</div>
+
+<script>
+
+function showTab(tab){
+    if(tab === "login"){
+        document.getElementById("loginForm").style.display = "block";
+        document.getElementById("registerForm").style.display = "none";
+        document.getElementById("loginTab").classList.add("active");
+        document.getElementById("registerTab").classList.remove("active");
+    } else {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("registerForm").style.display = "block";
+        document.getElementById("loginTab").classList.remove("active");
+        document.getElementById("registerTab").classList.add("active");
+    }
+}
+
+async function login(){
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    if(!email || !password){
+        alert("Please enter both email and password");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:5000/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+            // Store credentials
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("role", data.user.role);
+            localStorage.setItem("userName", data.user.name);
+
+            // Redirect based on role
+            if(data.user.role === "student"){
+                window.location.href = "student/student.html";
+            } else if(data.user.role === "instructor"){
+                window.location.href = "instructor/instructor.html";
+            }
+        } else {
+            alert(data.message || "Login failed");
+        }
+    } catch(error){
+        console.error("Login error:", error);
+        alert("Error connecting to server. Please make sure the backend is running.");
+    }
+}
+
+async function register(){
+    const name = document.getElementById("regName").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value;
+    const role = document.getElementById("regRole").value;
+
+    if(!name || !email || !password){
+        alert("All fields are required");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:5000/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, email, password, role })
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+            alert("Registration successful! You can now log in.");
+            showTab("login");
+            document.getElementById("loginEmail").value = email;
+            document.getElementById("loginPassword").value = password;
+        } else {
+            alert(data.message || "Registration failed");
+        }
+    } catch(error){
+        console.error("Registration error:", error);
+        alert("Error connecting to server. Please make sure the backend is running.");
+    }
+}
+
+</script>
+
+</body>
+</html>

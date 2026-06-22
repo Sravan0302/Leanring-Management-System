@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Catalog</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f1f5f9;
+}
+
+/* Navbar */
+nav{
+    background:#0f172a;
+    padding:15px 30px;
+    display:flex;
+    gap:25px;
+    align-items:center;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+nav a:hover,
+nav a.active{
+    color:#38bdf8;
+}
+
+/* Header */
+header{
+    background:#1e293b;
+    color:white;
+    text-align:center;
+    padding:35px 20px;
+}
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #94a3b8;
+}
+
+.container{
+    padding:30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Search */
+.search-section {
+    margin-bottom: 30px;
+}
+
+#searchBar {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    outline: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: border-color 0.2s ease;
+}
+
+#searchBar:focus {
+    border-color: #38bdf8;
+}
+
+/* Courses Grid */
+.courses{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:25px;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card h3{
+    color: #0f172a;
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.card p{
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.card button{
+    width: 100%;
+    padding:12px;
+    border:none;
+    background:#38bdf8;
+    color:white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius:8px;
+    cursor:pointer;
+    transition: background 0.2s ease;
+}
+
+.card button:hover{
+    background:#0284c7;
+}
+
+@media(max-width:768px){
+    nav{
+        flex-wrap:wrap;
+        gap: 15px;
+    }
+    .container{
+        padding:15px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav>
+    <a href="#" id="dashboardLink">Dashboard</a>
+    <a href="courses.html" class="active">Courses</a>
+    <a href="../assignments/assignments.html">Assignments</a>
+    <a href="../certificate/certificate.html">Certificate</a>
+    <a href="../index.html" id="logoutLink">Logout</a>
+</nav>
+
+<!-- Header -->
+<header>
+    <h1>Course Catalog</h1>
+    <p>Explore all available learning courses</p>
+</header>
+
+<div class="container">
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <input type="text" id="searchBar" oninput="filterCourses()" placeholder="🔍 Search courses by title or description...">
+    </div>
+
+    <!-- Courses Grid -->
+    <div class="courses" id="coursesGrid">
+        <p style="text-align: center; color: #64748b; grid-column: 1/-1;">Loading courses...</p>
+    </div>
+
+</div>
+
+<script>
+// Check Authentication on Load
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+
+if (!token) {
+    alert("Unauthorized access! Please login first.");
+    localStorage.clear();
+    window.location.href = "../index.html";
+}
+
+// Setup Dashboard link based on user role
+const dashboardLink = document.getElementById("dashboardLink");
+if (role === "instructor") {
+    dashboardLink.href = "../instructor/instructor.html";
+} else {
+    dashboardLink.href = "../student/student.html";
+}
+
+let allCourses = [];
+
+// Fetch courses from backend
+async function loadCourses() {
+    try {
+        const response = await fetch("http://localhost:5000/api/courses");
+        allCourses = await response.json();
+        renderCourses(allCourses);
+    } catch (error) {
+        console.error("Error loading courses:", error);
+        document.getElementById("coursesGrid").innerHTML = 
+            "<p style='color: #ef4444; grid-column: 1/-1; text-align: center;'>Failed to load courses from backend server.</p>";
+    }
+}
+
+function renderCourses(coursesList) {
+    const grid = document.getElementById("coursesGrid");
+    grid.innerHTML = "";
+
+    if (coursesList.length === 0) {
+        grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px;'>No matching courses found.</p>";
+        return;
+    }
+
+    coursesList.forEach(course => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <div>
+                <h3>${course.title}</h3>
+                <p>${course.description || "No description provided."}</p>
+            </div>
+            <button onclick="viewCourse('${course._id}')">Start Learning</button>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function filterCourses() {
+    const query = document.getElementById("searchBar").value.toLowerCase().trim();
+    const filtered = allCourses.filter(course => {
+        return course.title.toLowerCase().includes(query) || 
+               (course.description && course.description.toLowerCase().includes(query));
+    });
+    renderCourses(filtered);
+}
+
+function viewCourse(id) {
+    window.location.href = `course.html?id=${id}`;
+}
+
+// Handle Logout
+const logoutLink = document.getElementById("logoutLink");
+logoutLink.onclick = (e) => {
+    e.preventDefault();
+    localStorage.clear();
+    window.location.href = "../index.html";
+};
+
+// Run on load
+loadCourses();
+</script>
+
+</body>
+</html>
