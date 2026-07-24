@@ -13,12 +13,13 @@ function loadDB() {
       if (!data.users) data.users = [];
       if (!data.courses) data.courses = [];
       if (!data.progress) data.progress = [];
+      if (!data.otpverifications) data.otpverifications = [];
       return data;
     }
   } catch (e) {
     console.error("[MOCK DB] Failed to load mock DB, resetting:", e.message);
   }
-  return { users: [], courses: [], progress: [] };
+  return { users: [], courses: [], progress: [], otpverifications: [] };
 }
 
 function saveDB(data) {

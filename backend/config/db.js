@@ -3,13 +3,16 @@ const mockDB = require("./mockDB");
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000
+    console.log("Attempting database connection to URI:", process.env.MONGO_URI ? process.env.MONGO_URI.replace(/:([^@]+)@/, ":****@") : "undefined");
+    // Attempt connection with a 20-second selection timeout to support slower network connections
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 20000
     });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log("MongoDB Connected successfully.");
   } catch (error) {
-    console.warn("MongoDB Atlas Connection Failed.");
+    console.error("MongoDB Connection Error Details:", error);
+    console.warn("MongoDB Atlas Connection Failed or Timed Out.");
     console.warn("Falling back to local file-based database (db.json)...");
     mockDB.enable();
   }

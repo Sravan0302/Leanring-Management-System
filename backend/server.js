@@ -15,8 +15,6 @@ dotenv.config();
 
 // console.log(process.env.MONGO_URI);
 
-connectDB();
-
 const app = express();
 
 app.use(cors());
@@ -32,10 +30,11 @@ app.get("/", (req, res) => {
   res.send("LMS Backend Running");
 });
 
-
-
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Start server only after database or mock fallback is fully initialized
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });

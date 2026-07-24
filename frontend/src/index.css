@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-100 font-sans;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-800;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded-md hover:bg-slate-600;
+}
+
+/* Print layout for certificates */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-certificate, .print-certificate * {
+    visibility: visible;
+  }
+  .print-certificate {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    border: 12px solid #4f46e5 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 30px !important;
+    background-color: white !important;
+    color: black !important;
+  }
+  .print-btn {
+    display: none !important;
+  }
+}
